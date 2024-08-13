@@ -19,7 +19,17 @@ pub const ClassFile = struct {
     attributes: attribute.Attributes,
 };
 
+pub const Error = error{
+    NotAClassFile,
+};
+
 pub fn parse(data: *bytes.Reader) !ClassFile {
+    const magic = try data.read_u32(); // magic tag
+
+    if (magic != 0xCAFEBABE) {
+        return Error.NotAClassFile;
+    }
+
     const minor_version = try data.read_u16();
     const major_version = try data.read_u16();
     const constant = try constants.parse(data);

@@ -21,7 +21,6 @@ pub fn main() !void {
 
     const class_file = try root.parse(bytes_read);
 
-    _ = class_file;
-
-    std.debug.print("Read {d} bytes\n", .{bytes_read});
+    std.debug.print("Minor version: {}\n", .{class_file.minor_version});
+    std.debug.print("Major version: {}\n", .{class_file.major_version});
 }
