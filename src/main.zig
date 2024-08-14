@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const root = @import("root.zig");
+const class = @import("class.zig");
 
 const ALLOC = @import("alloc.zig").ALLOC;
 
@@ -19,8 +19,8 @@ pub fn main() !void {
     const bytes_read = try file.readToEndAlloc(ALLOC, stat.size);
     defer ALLOC.free(bytes_read);
 
-    const class_file = try root.parse(bytes_read);
+    const cf = try class.parse(bytes_read);
 
-    std.debug.print("Minor version: {}\n", .{class_file.minor_version});
-    std.debug.print("Major version: {}\n", .{class_file.major_version});
+    std.debug.print("Minor version: {}\n", .{cf.minor_version});
+    std.debug.print("Major version: {}\n", .{cf.major_version});
 }
