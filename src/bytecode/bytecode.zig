@@ -8,6 +8,8 @@ const bytes = @import("../bytes/bytes.zig");
 const ALLOC = @import("../alloc.zig").ALLOC;
 
 pub const Buffer = struct {
+    max_stack: u16,
+    max_locals: u16,
     data: std.ArrayList(instructions.Instruction),
 
     pub fn from_attr(attrs: attributes.Attributes, pool: *constant.Constants) !?Buffer {
@@ -33,14 +35,21 @@ pub const Buffer = struct {
     }
 
     pub fn parse(reader: *bytes.Reader) !Buffer {
-        var code = try std.ArrayList(instructions.Instruction).initCapacity(ALLOC, reader.buffer.len / 3 * 2);
+        const max_stack = try reader.read_u16();
+        const max_locals = try reader.read_u16();
 
-        while (reader.pos <= reader.buffer.len) {
+        const code_length = try reader.read_u32();
+
+        var code = try std.ArrayList(instructions.Instruction).initCapacity(ALLOC, code_length / 3 * 2);
+
+        const code_end = reader.pos + @as(usize, code_length);
+
+        while (reader.pos < code_end) {
             const inst = try @import("parse.zig").parse(reader);
 
             try code.append(inst);
         }
 
-        return Buffer{ .data = code };
+        return Buffer{ .max_stack = max_stack, .max_locals = max_locals, .data = code };
     }
 };
