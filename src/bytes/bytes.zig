@@ -67,9 +67,8 @@ pub const Reader = struct {
             return Error.EOF;
         }
 
-        const result = try std.ArrayList(u8).initCapacity(ALLOC, len);
-        // try result.insertSlice(0, self.buffer[self.pos .. self.pos + len]);
-        //TODO: somehow move the slice into the arraylist
+        var result = try std.ArrayList(u8).initCapacity(ALLOC, len);
+        try result.insertSlice(0, self.buffer[self.pos .. self.pos + len]);
 
         self.pos += len;
 
