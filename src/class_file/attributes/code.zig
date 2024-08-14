@@ -5,6 +5,7 @@ const attributes = @import("attributes");
 pub const CodeAttribute = struct {
     max_stack: u16,
     max_locals: u16,
+    code: std.ArrayList(u8),
     exception_table: std.ArrayList(ExceptionTableEntry),
     attributes: std.ArrayList(attributes.AttributeInfo),
 };

@@ -8,6 +8,10 @@ pub const String = struct {
         self.data = std.ArrayList(u8).initCapacity(ALLOC, self.len);
     }
 
+    pub fn from_list(data: std.ArrayList(u8)) String {
+        return String{ .data = data };
+    }
+
     pub fn deinit(self: String) void {
         self.data.deinit(ALLOC);
     }
@@ -33,8 +37,8 @@ pub fn Flags(comptime T: type, comptime F: type) type {
     return struct {
         flags: F,
 
-        pub fn init(self: T) T {
-            self.flags = 0;
+        pub fn from(val: F) @This() {
+            return @This(){ .flags = val };
         }
 
         pub fn set(self: *@This(), flag: T) void {

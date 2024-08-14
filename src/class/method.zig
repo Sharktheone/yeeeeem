@@ -3,8 +3,7 @@ const bytecode = @import("../bytecode/bytecode.zig");
 
 pub const Method = struct {
     access_flags: utils.Flags(MethodAccessFlags, u16),
-    name: utils.String,
-    descriptor: utils.String,
+    full_name: utils.String,
     bytecode: bytecode.Buffer,
 
     // attributes: MethodAttributes,

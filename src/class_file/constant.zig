@@ -2,8 +2,22 @@ const std = @import("std");
 const bytes = @import("../bytes/bytes.zig");
 const ALLOC = @import("../alloc.zig").ALLOC;
 
+const Error = error{
+    Utf8Error,
+};
+
 pub const Constants = struct {
     pool: std.ArrayList(Constant),
+
+    pub fn get_utf8(self: *Constants, index: u16) ![]u8 {
+        const constant = self.pool.items[index - 1];
+
+        if (@as(ConstantTag, constant) != ConstantTag.utf8) {
+            return Error.Utf8Error;
+        }
+
+        return constant.utf8.bytes.items;
+    }
 };
 
 pub const ConstantTag = enum(u8) {
