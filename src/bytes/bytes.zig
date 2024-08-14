@@ -63,7 +63,7 @@ pub const Reader = struct {
     }
 
     pub fn read(self: *Reader, len: usize) !std.ArrayList(u8) {
-        if (self.pos + len >= self.buffer.len) {
+        if (self.pos + len > self.buffer.len) {
             return Error.EOF;
         }
 
