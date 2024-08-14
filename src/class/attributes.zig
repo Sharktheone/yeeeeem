@@ -11,16 +11,29 @@ pub const Attributes = struct {
 pub const AttributeInfo = struct {
     attribute_name_index: u16,
     info: std.ArrayList(u8),
+
+    pub fn parse(reader: *bytes.Reader) !AttributeInfo {
+        const name_index = try reader.read_u16();
+        const count = try reader.read_u32();
+
+        const info = try reader.read(count);
+
+        return .{
+            .attribute_name_index = name_index,
+            .info = info,
+        };
+    }
 };
 
 pub fn parse(reader: *bytes.Reader) !Attributes {
-    var pool = std.ArrayList(AttributeInfo).init(ALLOC);
-
     const count = try reader.read_u16();
 
-    try pool.resize(@as(usize, count));
+    var attributes = try std.ArrayList(AttributeInfo).initCapacity(ALLOC, count);
 
-    return .{
-        .attributes = pool,
-    };
+    for (0..count) |_| {
+        const info = try AttributeInfo.parse(reader);
+        try attributes.append(info);
+    }
+
+    return .{ .attributes = attributes };
 }

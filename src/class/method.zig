@@ -10,10 +10,24 @@ pub const Methods = struct {
 };
 
 pub const MethodInfo = struct {
-    access_flags: MethodAccessFlags,
+    access_flags: u16,
     name_index: u16,
     descriptor_index: u16,
     attributes: attributes.Attributes,
+
+    fn parse(reader: *bytes.Reader) !MethodInfo {
+        const access_flags = try reader.read_u16();
+        const name_index = try reader.read_u16();
+        const descriptor_index = try reader.read_u16();
+        const attrs = try attributes.parse(reader);
+
+        return .{
+            .access_flags = access_flags, //TODO: this is probably wrong, since access_flags is an bitfield
+            .name_index = name_index,
+            .descriptor_index = descriptor_index,
+            .attributes = attrs,
+        };
+    }
 };
 
 pub const MethodAccessFlags = enum {
@@ -32,11 +46,13 @@ pub const MethodAccessFlags = enum {
 };
 
 pub fn parse(reader: *bytes.Reader) !Methods {
-    var pool = std.ArrayList(MethodInfo).init(ALLOC);
-
     const count = try reader.read_u16();
+    var pool = try std.ArrayList(MethodInfo).initCapacity(ALLOC, count);
 
-    try pool.resize(@as(usize, count));
+    for (0..count) |_| {
+        const method = try MethodInfo.parse(reader);
+        try pool.append(method);
+    }
 
     return .{
         .methods = pool,

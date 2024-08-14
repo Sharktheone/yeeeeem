@@ -33,9 +33,6 @@ pub fn parse(data: *bytes.Reader) !ClassFile {
     const minor_version = try data.read_u16();
     const major_version = try data.read_u16();
 
-    std.debug.print("minor_version: {}\n", .{minor_version});
-    std.debug.print("major_version: {}\n", .{major_version});
-
     const constant = try constants.parse(data);
     const access_flags = try data.read_u16();
     const this_class = try data.read_u16();

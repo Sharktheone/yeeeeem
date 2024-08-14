@@ -10,14 +10,26 @@ pub const Interfaces = struct {
 pub const ClassInfo = struct {
     tag: u8,
     name_index: u16,
+
+    fn parse(reader: *bytes.Reader) !ClassInfo {
+        const tag = try reader.read_u8();
+        const name_index = try reader.read_u16();
+
+        return .{
+            .tag = tag,
+            .name_index = name_index,
+        };
+    }
 };
 
 pub fn parse(reader: *bytes.Reader) !Interfaces {
-    var pool = std.ArrayList(ClassInfo).init(ALLOC);
-
     const count = try reader.read_u16();
+    var pool = try std.ArrayList(ClassInfo).initCapacity(ALLOC, count);
 
-    try pool.resize(@as(usize, count));
+    for (0..count) |_| {
+        const info = try ClassInfo.parse(reader);
+        try pool.append(info);
+    }
 
     return .{
         .interfaces = pool,

@@ -76,8 +76,6 @@ pub const Constant = union(ConstantTag) {
     fn parse(reader: *bytes.Reader) !Constant {
         const tag_val = try reader.read_u8();
 
-        std.debug.print("tag: {}\n", .{tag_val});
-
         const tag: ConstantTag = @enumFromInt(tag_val);
 
         return switch (tag) {
@@ -140,12 +138,8 @@ pub fn parse(reader: *bytes.Reader) !Constants {
 
     const count = try reader.read_u16();
 
-    std.debug.print("count: {}\n", .{count});
-
-    for (0..count - 1) |i| {
+    for (0..count - 1) |_| {
         const constant = try Constant.parse(reader);
-
-        std.debug.print("constant: {}{}\n", .{ i, constant });
 
         try pool.append(constant);
     }
