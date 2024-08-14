@@ -17,6 +17,7 @@ pub fn main() !void {
 
     try file.seekTo(0);
     const bytes_read = try file.readToEndAlloc(ALLOC, stat.size);
+
     defer ALLOC.free(bytes_read);
 
     const cf = try class.parse(bytes_read);

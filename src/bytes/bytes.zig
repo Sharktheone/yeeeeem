@@ -30,6 +30,14 @@ pub const Reader = struct {
         return std.mem.readInt(u64, try self.read_n(8), std.builtin.Endian.big);
     }
 
+    pub fn read_i8(self: *Reader) Error!i8 {
+        return std.mem.readInt(i8, try self.read_n(1), std.builtin.Endian.big);
+    }
+
+    pub fn read_i16(self: *Reader) Error!i16 {
+        return std.mem.readInt(i16, try self.read_n(2), std.builtin.Endian.big);
+    }
+
     pub fn read_i32(self: *Reader) Error!i32 {
         return std.mem.readInt(i32, try self.read_n(4), std.builtin.Endian.big);
     }
