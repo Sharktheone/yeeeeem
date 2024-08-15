@@ -11,7 +11,7 @@ pub const Constants = struct {
     pool: std.ArrayList(Constant),
 
     pub fn get_utf8(self: *Constants, index: u16) ![]u8 {
-        const constant = self.pool.items[index - 1];
+        const constant = try self.get(index);
 
         if (@as(ConstantTag, constant) != ConstantTag.utf8) {
             return Error.Utf8Error;
@@ -21,7 +21,7 @@ pub const Constants = struct {
     }
 
     pub fn get_class(self: *Constants, index: u16) ![]u8 {
-        const constant = self.pool.items[index - 1];
+        const constant = try self.get(index);
 
         if (@as(ConstantTag, constant) != ConstantTag.class) {
             return Error.Utf8Error;
@@ -31,7 +31,7 @@ pub const Constants = struct {
     }
 
     pub fn get_full_name(self: *Constants, index: u16) !utils.String {
-        const constant = self.pool.items[index - 1];
+        const constant = try self.get(index);
 
         if (@as(ConstantTag, constant) != ConstantTag.name_and_type) {
             return Error.Utf8Error;
@@ -46,6 +46,14 @@ pub const Constants = struct {
         try str.data.appendSlice(descriptor);
 
         return str;
+    }
+
+    pub fn get(self: *Constants, index: u16) !Constant {
+        if (self.pool.items.len <= index - 1) {
+            return Error.Utf8Error;
+        }
+
+        return self.pool.items[index - 1];
     }
 };
 
@@ -181,7 +189,9 @@ pub fn parse(reader: *bytes.Reader) !Constants {
 
     const count = try reader.read_u16();
 
-    for (0..count - 1) |_| {
+    for (0..count - 1) |i| {
+        std.debug.print("#{}: ", .{i});
+
         const constant = try Constant.parse(reader);
 
         try pool.append(constant);

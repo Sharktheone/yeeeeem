@@ -8,13 +8,9 @@ const utils = @import("../../utils.zig");
 pub fn getstatic(m: *vm.Vm, idx: u16) !void {
     const class = m.current_class orelse return error.missing_class;
 
-    const items = &class.constant.pool.items;
+    const items = &class.constant;
 
-    if (idx >= items.len) {
-        return error.invalid_index;
-    }
-
-    const item = items.*[idx];
+    const item = try items.get(idx);
 
     if (@as(constant.ConstantTag, item) != constant.ConstantTag.field_ref) {
         std.debug.print("Expected field_ref, got {} ({})\n", .{ @as(constant.ConstantTag, item), idx });

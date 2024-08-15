@@ -19,13 +19,10 @@ pub fn invokevirtual(m: *vm.Vm, mref_idx: u16) !void {
 
         if (@as(variable.Type, arg) == variable.Type.objectref) {
             objectref = arg.objectref;
+            break;
         }
 
         try args.append(arg);
-    }
-
-    if (objectref == undefined) {
-        return error.NullPointerException;
     }
 
     var class = try m.get_class(objectref.class);
@@ -34,12 +31,8 @@ pub fn invokevirtual(m: *vm.Vm, mref_idx: u16) !void {
         return error.NullPointerException;
     }
 
-    const const_items = &m.current_class.?.constant.pool.items;
-    if (const_items.len <= mref_idx) {
-        return error.IndexOutOfBoundsException;
-    }
-
-    const mref = const_items[mref_idx];
+    const const_items = &m.current_class.?.constant;
+    const mref = try const_items.get(mref_idx);
 
     if (@as(constant.ConstantTag, mref) != constant.ConstantTag.method_ref) {
         return error.IncompatibleClassChangeError;
@@ -47,11 +40,7 @@ pub fn invokevirtual(m: *vm.Vm, mref_idx: u16) !void {
 
     const method = mref.method_ref;
 
-    if (const_items.len <= method.class_index) {
-        return error.IndexOutOfBoundsException;
-    }
-
-    const class_name_const = const_items[method.class_index];
+    const class_name_const = try const_items.get(method.class_index);
 
     if (@as(constant.ConstantTag, class_name_const) != constant.ConstantTag.class) {
         return error.IncompatibleClassChangeError;
@@ -59,21 +48,13 @@ pub fn invokevirtual(m: *vm.Vm, mref_idx: u16) !void {
 
     const class_name_idx = class_name_const.class.name_index;
 
-    if (const_items.len <= class_name_idx) {
-        return error.IndexOutOfBoundsException;
-    }
-
-    const class_name = try m.current_class.?.constant.get_utf8(class_name_idx);
+    const class_name = try const_items.get_utf8(class_name_idx);
 
     if (!class.name.is_slice(class_name)) {
         return error.IncompatibleClassChangeError;
     }
 
-    if (const_items.len <= method.name_and_type_index) {
-        return error.IndexOutOfBoundsException;
-    }
-
-    const method_name_type = const_items[method.name_and_type_index];
+    const method_name_type = try const_items.get(method.name_and_type_index);
 
     if (@as(constant.ConstantTag, method_name_type) != constant.ConstantTag.name_and_type) {
         return error.IncompatibleClassChangeError;
