@@ -1,6 +1,7 @@
 const std = @import("std");
 const bytes = @import("../bytes/bytes.zig");
 const ALLOC = @import("../alloc.zig").ALLOC;
+const utils = @import("../utils.zig");
 
 const Error = error{
     Utf8Error,
@@ -17,6 +18,34 @@ pub const Constants = struct {
         }
 
         return constant.utf8.bytes.items;
+    }
+
+    pub fn get_class(self: *Constants, index: u16) ![]u8 {
+        const constant = self.pool.items[index - 1];
+
+        if (@as(ConstantTag, constant) != ConstantTag.class) {
+            return Error.Utf8Error;
+        }
+
+        return try self.get_utf8(constant.class.name_index);
+    }
+
+    pub fn get_full_name(self: *Constants, index: u16) !utils.String {
+        const constant = self.pool.items[index - 1];
+
+        if (@as(ConstantTag, constant) != ConstantTag.name_and_type) {
+            return Error.Utf8Error;
+        }
+
+        const name = try self.get_utf8(constant.name_and_type.name_index);
+        const descriptor = try self.get_utf8(constant.name_and_type.descriptor_index);
+
+        var str = try utils.String.from_slice(name);
+
+        try str.push(':');
+        try str.data.appendSlice(descriptor);
+
+        return str;
     }
 };
 

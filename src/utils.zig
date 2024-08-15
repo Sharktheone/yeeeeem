@@ -34,8 +34,8 @@ pub const String = struct {
         return self.data.capacity;
     }
 
-    pub fn push(self: *String, c: u8) void {
-        self.data.items.append(ALLOC, c);
+    pub fn push(self: *String, c: u8) !void {
+        try self.data.append(c);
     }
 
     pub fn print(self: *String) void {
@@ -44,6 +44,10 @@ pub const String = struct {
 
     pub fn is(self: *const String, other: *const String) bool {
         return std.mem.eql(u8, self.data.allocatedSlice(), other.data.allocatedSlice());
+    }
+
+    pub fn is_slice(self: *const String, other: []const u8) bool {
+        return std.mem.eql(u8, self.data.allocatedSlice(), other);
     }
 
     pub fn clone(self: *const String) !String {

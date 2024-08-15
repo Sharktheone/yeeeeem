@@ -18,10 +18,14 @@ const Error = error{
 
 pub const Vm = struct {
     storage: std.ArrayList(storage.Storage),
+    classes: std.StringHashMap(*class.Class),
+
+    current_class: ?*class.Class = null,
 
     pub fn init() !Vm {
         return Vm{
             .storage = try std.ArrayList(storage.Storage).initCapacity(ALLOC, 4),
+            .classes = std.StringHashMap(*class.Class).init(ALLOC),
         };
     }
 
@@ -31,6 +35,7 @@ pub const Vm = struct {
     }
 
     pub fn entry(self: *Vm, c: *class.Class) !void {
+        self.current_class = c;
         const method = c.search_method(try utils.String.from_slice(MAIN));
 
         if (method == null) {

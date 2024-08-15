@@ -15,3 +15,7 @@ pub const imul = @import("imul.zig").imul;
 pub const idiv = @import("idiv.zig").idiv;
 pub const irem = @import("irem.zig").irem;
 pub const ineg = @import("ineg.zig").ineg;
+
+pub const getstatic = @import("getstatic.zig").getstatic;
+pub const ldc = @import("ldc.zig").ldc;
+pub const invokevirtual = @import("invokevirtual.zig").invokevirtual;

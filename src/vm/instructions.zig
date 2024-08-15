@@ -26,6 +26,7 @@ pub fn execute(m: *vm.Vm, code: *bytecode.Buffer) !void {
 }
 
 pub fn execute_instruction(m: *vm.Vm, inst: bytecode.instructions.Instruction) !void {
+    std.debug.print("Executing instruction {}\n", .{@as(OpCode, inst)});
     switch (inst) {
         .nop => {},
         .bipush => |val| try i.bipush(m, val),
@@ -45,6 +46,9 @@ pub fn execute_instruction(m: *vm.Vm, inst: bytecode.instructions.Instruction) !
         .idiv => try i.idiv(m),
         .irem => try i.irem(m),
         ._return => return controlflow.ret,
+        .getstatic => |val| try i.getstatic(m, val),
+        .invokevirtual => |val| try i.invokevirtual(m, val),
+        .ldc => |val| try i.ldc(m, val),
 
         else => std.debug.panic("instruction {} is not implemented", .{@as(OpCode, inst)}),
     }
