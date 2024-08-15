@@ -7,10 +7,10 @@ pub const Storage = struct {
     locals: locals.Locals,
     ip: usize,
 
-    pub fn init(s: u32, l: u32) Storage {
+    pub fn init(s: u32, l: u32) !Storage {
         return Storage{
-            .stack = stack.Stack.init(s),
-            .locals = stack.Stack.init(l),
+            .stack = try stack.Stack.init(s),
+            .locals = try locals.Locals.init(l),
             .ip = 0,
         };
     }

@@ -46,8 +46,10 @@ pub const Vm = struct {
         try instructions.execute(self, c);
     }
 
-    pub fn ip(self: *Vm) ?usize {
-        return self.current_storage().?.ip;
+    pub fn ip(self: *Vm) !usize {
+        const s = self.current_storage() orelse return error.NoStorage;
+
+        return s.ip;
     }
 
     pub fn current_storage(self: *Vm) ?*storage.Storage {
@@ -56,5 +58,19 @@ pub const Vm = struct {
         }
 
         return &self.storage.items[self.storage.items.len - 1];
+    }
+
+    pub fn new_storage(vm: *Vm, s_cap: u32, l_cap: u32) !void {
+        const s = try storage.Storage.init(s_cap, l_cap);
+
+        try vm.storage.append(s);
+    }
+
+    pub fn pop_storage(vm: *Vm) void {
+        if (vm.storage.items.len == 0) {
+            return;
+        }
+
+        _ = vm.storage.items.pop();
     }
 };

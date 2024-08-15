@@ -2,7 +2,7 @@ const std = @import("std");
 
 const variable = @import("variable.zig");
 
-const ALLOC = @import("../alloc.zig");
+const ALLOC = @import("../alloc.zig").ALLOC;
 
 pub const Locals = struct {
     zero: variable.Variable,
@@ -12,13 +12,13 @@ pub const Locals = struct {
 
     rest: std.ArrayList(variable.Variable),
 
-    pub fn init(cap: u32) Locals {
+    pub fn init(cap: u32) !Locals {
         return Locals{
-            .zero = variable.Variable{ .name = "zero", .value = 0 },
-            .one = variable.Variable{ .name = "one", .value = 1 },
-            .two = variable.Variable{ .name = "two", .value = 2 },
-            .three = variable.Variable{ .name = "three", .value = 3 },
-            .rest = std.ArrayList(variable.Variable).initCapcaity(ALLOC, cap),
+            .zero = variable.Variable.void,
+            .one = variable.Variable.void,
+            .two = variable.Variable.void,
+            .three = variable.Variable.void,
+            .rest = try std.ArrayList(variable.Variable).initCapacity(ALLOC, cap),
         };
     }
 

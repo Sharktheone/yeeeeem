@@ -6,6 +6,12 @@ const ALLOC = @import("../alloc.zig").ALLOC;
 pub const Stack = struct {
     frames: std.ArrayList(Frame),
 
+    pub fn init(capacity: usize) !Stack {
+        return Stack{
+            .frames = try std.ArrayList(Frame).initCapacity(ALLOC, capacity),
+        };
+    }
+
     pub fn add_frame(self: *Stack, name: ?utils.String) !void {
         try self.frames.append(
             Frame{ .name = name, .variables = std.ArrayList.init(ALLOC) },
