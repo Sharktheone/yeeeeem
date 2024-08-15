@@ -12,6 +12,16 @@ pub const String = struct {
         return String{ .data = data };
     }
 
+    pub fn from_slice(data: []const u8) !String {
+        var buffer = try std.ArrayList(u8).initCapacity(ALLOC, data.len);
+
+        try buffer.appendSlice(data);
+
+        return String{
+            .data = buffer,
+        };
+    }
+
     pub fn deinit(self: String) void {
         self.data.deinit(ALLOC);
     }
@@ -30,6 +40,10 @@ pub const String = struct {
 
     pub fn print(self: *String) void {
         std.debug.print("{s}", .{self.data.allocatedSlice()});
+    }
+
+    pub fn is(self: *const String, other: *const String) bool {
+        return std.mem.eql(u8, self.data.allocatedSlice(), other.data.allocatedSlice());
     }
 };
 

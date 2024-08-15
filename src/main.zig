@@ -1,5 +1,5 @@
 const std = @import("std");
-
+const virtual_machine = @import("vm/vm.zig");
 const class = @import("class.zig");
 
 const ALLOC = @import("alloc.zig").ALLOC;
@@ -20,8 +20,9 @@ pub fn main() !void {
 
     defer ALLOC.free(bytes_read);
 
-    const cf = try class.parse(bytes_read);
+    var cf = try class.parse(bytes_read);
 
-    std.debug.print("Minor version: {}\n", .{cf.minor_version});
-    std.debug.print("Major version: {}\n", .{cf.major_version});
+    var vm = try virtual_machine.Vm.init();
+
+    try vm.entry(&cf);
 }

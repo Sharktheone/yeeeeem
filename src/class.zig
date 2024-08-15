@@ -15,6 +15,16 @@ pub const Class = struct {
     constant: constant.Constants,
     fields: std.ArrayList(Field),
     methods: std.ArrayList(Method),
+
+    pub fn search_method(self: *Class, full_name: utils.String) ?Method {
+        for (self.methods.items) |m| {
+            if (m.full_name.is(&full_name)) {
+                return m;
+            }
+        }
+
+        return null;
+    }
 };
 
 pub fn parse(data: []u8) !Class {
