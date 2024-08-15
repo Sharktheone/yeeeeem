@@ -1,10 +1,14 @@
 const utils = @import("../utils.zig");
 const bytecode = @import("../bytecode/bytecode.zig");
+const Error = @import("../vm/vm.zig").Error;
+const vm = @import("../vm/vm.zig");
+const variable = @import("../vm/variable.zig");
 
 pub const Method = struct {
     access_flags: utils.Flags(MethodAccessFlags, u16),
     full_name: utils.String,
-    bytecode: bytecode.Buffer,
+    bytecode: ?bytecode.Buffer,
+    fn_ptr: ?*const fn (m: *vm.Vm, args: []variable.Variable) Error!variable.Variable,
 
     // attributes: MethodAttributes,
 };

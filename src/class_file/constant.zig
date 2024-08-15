@@ -10,6 +10,10 @@ const Error = error{
 pub const Constants = struct {
     pool: std.ArrayList(Constant),
 
+    pub fn init() Constants {
+        return Constants{ .pool = std.ArrayList(Constant).init(ALLOC) };
+    }
+
     pub fn get_utf8(self: *Constants, index: u16) ![]u8 {
         const constant = try self.get(index);
 

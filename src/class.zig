@@ -67,9 +67,14 @@ pub fn parse(data: []u8) !Class {
         try full_name.append(':');
         try full_name.appendSlice(descriptor);
 
-        try methods.append(Method{ .access_flags = utils.Flags(method.MethodAccessFlags, u16).from(m.access_flags), .full_name = utils.String.from_list(full_name), .bytecode = try bytecode.Buffer.from_attr(m.attributes, &cf.constant) orelse {
-            continue;
-        } });
+        try methods.append(Method{
+            .access_flags = utils.Flags(method.MethodAccessFlags, u16).from(m.access_flags),
+            .full_name = utils.String.from_list(full_name),
+            .bytecode = try bytecode.Buffer.from_attr(m.attributes, &cf.constant) orelse {
+                continue;
+            },
+            .fn_ptr = null,
+        });
     }
 
     const name_slice = try cf.constant.get_class(cf.this_class);

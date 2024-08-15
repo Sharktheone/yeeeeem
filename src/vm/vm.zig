@@ -8,6 +8,7 @@ const locals = @import("locals.zig");
 const std = @import("std");
 const storage = @import("storage.zig");
 const Method = @import("../class/method.zig").Method;
+const env = @import("env.zig");
 
 const ALLOC = @import("../alloc.zig").ALLOC;
 
@@ -30,8 +31,7 @@ pub const Vm = struct {
     }
 
     pub fn init_env(self: *Vm) !void {
-        _ = self;
-        //TODO: implement
+        try env.init(self);
     }
 
     pub fn entry(self: *Vm, c: *class.Class) !void {
@@ -48,7 +48,17 @@ pub const Vm = struct {
     }
 
     pub fn invoke(self: *Vm, m: *Method, args: []variable.Variable) Error!void {
-        const bc = &m.bytecode;
+        if (m.bytecode == null) {
+            if (m.fn_ptr == null) {
+                return Error.NoSuchMethod;
+            }
+
+            const ret = try m.fn_ptr.?(self, args);
+
+            try self.push(ret);
+        }
+
+        const bc = &m.bytecode.?;
         try self.new_storage(bc.max_stack, bc.max_locals);
 
         for (args) |arg| {
