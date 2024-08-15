@@ -15,7 +15,11 @@ pub const String = struct {
     pub fn from_slice(data: []const u8) !String {
         var buffer = try std.ArrayList(u8).initCapacity(ALLOC, data.len);
 
-        try buffer.appendSlice(data);
+        if (data[data.len - 1] == 0) {
+            try buffer.appendSlice(data[0 .. data.len - 1]);
+        } else {
+            try buffer.appendSlice(data);
+        }
 
         return String{
             .data = buffer,
@@ -38,12 +42,12 @@ pub const String = struct {
         try self.data.append(c);
     }
 
-    pub fn print(self: *String) void {
-        std.debug.print("{s}", .{self.data.allocatedSlice()});
+    pub fn print(self: *const String) void {
+        std.debug.print("{s}", .{self.data.items});
     }
 
     pub fn is(self: *const String, other: *const String) bool {
-        return std.mem.eql(u8, self.data.allocatedSlice(), other.data.allocatedSlice());
+        return std.mem.eql(u8, self.data.items, other.data.items);
     }
 
     pub fn is_slice(self: *const String, other: []const u8) bool {

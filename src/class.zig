@@ -17,9 +17,9 @@ pub const Class = struct {
     methods: std.ArrayList(Method),
     name: utils.String,
 
-    pub fn get_method(self: *Class, full_name: utils.String) ?*Method {
+    pub fn get_method(self: *Class, full_name: *const utils.String) ?*Method {
         for (self.methods.items) |*m| {
-            if (m.full_name.is(&full_name)) {
+            if (m.full_name.is(full_name)) {
                 return m;
             }
         }
@@ -29,6 +29,31 @@ pub const Class = struct {
 
     pub fn get_field(self: *Class, full_name: []const u8) ?Field {
         return self.fields.get(full_name);
+    }
+
+    pub fn dump(self: *Class) void {
+        const name = self.name.data.items;
+
+        std.debug.print("Class: {s}\n", .{name});
+
+        var iter = self.fields.iterator();
+
+        while (true) {
+            const entry = iter.next();
+            if (entry == null) {
+                break;
+            }
+            const k = entry.?.key_ptr;
+            const v = entry.?.value_ptr;
+
+            std.debug.print("  Field: {s} = {any}\n", .{ k.*, v.* });
+        }
+
+        for (self.methods.items) |m| {
+            const n = m.full_name.data.items;
+
+            std.debug.print("  Method: {s}\n", .{n});
+        }
     }
 };
 

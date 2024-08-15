@@ -36,7 +36,7 @@ pub const Vm = struct {
 
     pub fn entry(self: *Vm, c: *class.Class) !void {
         self.current_class = c;
-        const method = c.get_method(try utils.String.from_slice(MAIN));
+        const method = c.get_method(&try utils.String.from_slice(MAIN));
 
         if (method == null) {
             return Error.MainNotoFound;
@@ -56,6 +56,7 @@ pub const Vm = struct {
             const ret = try m.fn_ptr.?(self, args);
 
             try self.push(ret);
+            return;
         }
 
         const bc = &m.bytecode.?;
@@ -73,7 +74,13 @@ pub const Vm = struct {
 
         self.pop_storage();
 
-        try self.push(ret);
+        var st = self.current_storage();
+
+        if (st == null) {
+            return;
+        }
+
+        try st.?.push(ret);
     }
 
     pub fn execute(self: *Vm, c: *bytecode.Buffer) Error!void {
@@ -108,7 +115,6 @@ pub const Vm = struct {
         if (vm.storage.items.len == 0) {
             return;
         }
-
         _ = vm.storage.pop();
     }
 

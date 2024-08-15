@@ -15,10 +15,14 @@ pub const Constants = struct {
     }
 
     pub fn get_utf8(self: *Constants, index: u16) ![]u8 {
-        const constant = try self.get(index);
+        var constant = try self.get(index);
 
         if (@as(ConstantTag, constant) != ConstantTag.utf8) {
             return Error.Utf8Error;
+        }
+
+        if (constant.utf8.bytes.getLast() == 0) {
+            _ = constant.utf8.bytes.pop();
         }
 
         return constant.utf8.bytes.items;

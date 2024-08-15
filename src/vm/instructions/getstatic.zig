@@ -26,7 +26,7 @@ pub fn getstatic(m: *vm.Vm, idx: u16) Error!void {
 
     const ref = variable.ObjectRef{
         .class = name,
-        .field = try descriptor.clone(),
+        .field = descriptor,
     };
 
     try m.push(Variable{ .objectref = ref });

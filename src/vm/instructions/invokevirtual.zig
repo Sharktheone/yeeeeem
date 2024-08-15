@@ -16,8 +16,6 @@ pub fn invokevirtual(m: *vm.Vm, mref_idx: u16) Error!void {
 
     const s = try m.get_storage();
 
-    s.dump();
-
     while (true) {
         const arg = try s.pop();
 
@@ -49,11 +47,6 @@ pub fn invokevirtual(m: *vm.Vm, mref_idx: u16) Error!void {
     var target_class: *Class = undefined;
 
     if (objectref.field != null) {
-        class.dump();
-
-        objectref.field.?.print();
-        std.debug.print("\n");
-
         const f = class.get_field(objectref.field.?.data.items) orelse return error.NullPointerException;
 
         if (@as(variable.Type, f.value) != variable.Type.class) {
@@ -76,10 +69,10 @@ pub fn invokevirtual(m: *vm.Vm, mref_idx: u16) Error!void {
     const class_name = try const_items.get_utf8(class_name_idx);
 
     if (!target_class.name.is_slice(class_name)) {
-        std.debug.print("expected class name {s} got {s}\n", .{ class_name, class.name.data.items });
+        std.debug.print("expected class name {s} got {s}\n", .{ class_name, target_class.name.data.items });
         return error.IncompatibleClassChangeError;
     }
 
-    const target = class.get_method(full_name) orelse return error.NoSuchMethod;
+    const target = target_class.get_method(&full_name) orelse return error.NoSuchMethod;
     try m.invoke(target, args.items);
 }

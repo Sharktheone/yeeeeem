@@ -55,6 +55,26 @@ pub const Variable = union(Type) {
             .class => std.debug.print("class: {}\n", .{self.class.name}),
         }
     }
+
+    pub fn print(self: *const Variable) void {
+        const std = @import("std");
+
+        switch (self.*) {
+            .void => {},
+            .int => std.debug.print("{}", .{self.int}),
+            .long => std.debug.print("{}", .{self.long}),
+            .float => std.debug.print("{}", .{self.float}),
+            .double => std.debug.print("{}", .{self.double}),
+            .string => self.string.print(),
+            .objectref => {
+                std.debug.print("{}", .{self.objectref.class});
+                if (self.objectref.field != null) {
+                    self.objectref.field.?.print();
+                }
+            },
+            .class => std.debug.print("{}", .{self.class.name}),
+        }
+    }
 };
 
 pub const ObjectRef = struct {
