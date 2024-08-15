@@ -83,4 +83,13 @@ pub const Vm = struct {
 
         try s.push(v);
     }
+
+    pub fn dump(self: *Vm) void {
+        var i: u32 = 0;
+        for (self.storage.items) |*s| {
+            std.debug.print("Storage: {} \n", .{i});
+            s.dump();
+            i += 1;
+        }
+    }
 };

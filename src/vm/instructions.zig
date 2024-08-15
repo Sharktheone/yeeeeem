@@ -44,7 +44,7 @@ pub fn execute_instruction(m: *vm.Vm, inst: bytecode.instructions.Instruction) !
         .isub => try i.isub(m),
         .idiv => try i.idiv(m),
         .irem => try i.irem(m),
-        ._return => return,
+        ._return => return controlflow.ret,
 
         else => std.debug.panic("instruction {} is not implemented", .{@as(OpCode, inst)}),
     }

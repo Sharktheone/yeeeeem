@@ -23,8 +23,8 @@ pub const Stack = struct {
             try self.add_frame(null);
         }
 
-        var frame = self.frames.items[self.frames.items.len - 1];
-        try frame.variables.append(v);
+        var frame = &self.frames.items[self.frames.items.len - 1];
+        try frame.push(v);
     }
 
     pub fn pop(self: *Stack) ?variable.Variable {
@@ -32,7 +32,7 @@ pub const Stack = struct {
             return null;
         }
 
-        var frame = self.frames.items[self.frames.items.len - 1];
+        var frame = &self.frames.items[self.frames.items.len - 1];
         return frame.pop();
     }
 
@@ -57,9 +57,24 @@ pub const Stack = struct {
             return null;
         }
 
-        var frame = self.frames.items[self.frames.items.len - 1];
+        var frame = &self.frames.items[self.frames.items.len - 1];
 
         return frame.load(idx);
+    }
+
+    pub fn dump(self: *Stack) void {
+        for (self.frames.items) |*frame| {
+            if (frame.name != null) {
+                std.debug.print("Frame:", .{});
+                frame.name.?.print();
+            } else {
+                std.debug.print("Frame: <unnamed>\n", .{});
+            }
+
+            for (frame.variables.items) |*v| {
+                v.dump();
+            }
+        }
     }
 };
 

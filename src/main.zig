@@ -25,4 +25,6 @@ pub fn main() !void {
     var vm = try virtual_machine.Vm.init();
 
     try vm.entry(&cf);
+
+    vm.dump();
 }

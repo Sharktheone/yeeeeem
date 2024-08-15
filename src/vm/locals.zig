@@ -41,4 +41,15 @@ pub const Locals = struct {
             self.rest.items[real_idx] = value;
         }
     }
+
+    pub fn dump(self: *Locals) void {
+        self.zero.dump();
+        self.one.dump();
+        self.two.dump();
+        self.three.dump();
+
+        for (self.rest.items) |*v| {
+            v.dump();
+        }
+    }
 };

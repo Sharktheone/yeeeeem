@@ -1,3 +1,4 @@
+const std = @import("std");
 const stack = @import("stack.zig");
 const locals = @import("locals.zig");
 const variable = @import("variable.zig");
@@ -65,5 +66,13 @@ pub const Storage = struct {
 
     pub fn store_3(self: *Storage, value: variable.Variable) void {
         self.locals.three = value;
+    }
+
+    pub fn dump(self: *Storage) void {
+        std.debug.print("Stack: ({})\n", .{self.stack.frames.items.len});
+        self.stack.dump();
+        std.debug.print("\nLocals: ({})", .{self.locals.rest.items.len + 4});
+        self.locals.dump();
+        std.debug.print("\n", .{});
     }
 };

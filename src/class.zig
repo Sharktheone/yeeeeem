@@ -64,12 +64,8 @@ pub fn parse(data: []u8) !Class {
         try full_name.appendSlice(descriptor);
 
         try methods.append(Method{ .access_flags = utils.Flags(method.MethodAccessFlags, u16).from(m.access_flags), .full_name = utils.String.from_list(full_name), .bytecode = try bytecode.Buffer.from_attr(m.attributes, &cf.constant) orelse {
-            std.debug.print("Method: {} has no bytecode\n", .{full_name});
             continue;
         } });
-
-        std.debug.print("Method: {}\n", .{full_name});
-        std.debug.print("Code: {}\n", .{methods.items[methods.items.len - 1].bytecode});
     }
 
     return Class{
