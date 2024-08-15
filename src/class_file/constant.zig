@@ -197,9 +197,7 @@ pub fn parse(reader: *bytes.Reader) !Constants {
 
     const count = try reader.read_u16();
 
-    for (0..count - 1) |i| {
-        std.debug.print("#{}: ", .{i});
-
+    for (0..count - 1) |_| {
         const constant = try Constant.parse(reader);
 
         try pool.append(constant);

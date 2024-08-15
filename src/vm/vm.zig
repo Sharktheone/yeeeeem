@@ -15,7 +15,7 @@ const ALLOC = @import("../alloc.zig").ALLOC;
 const MAIN: []const u8 = "main:([Ljava/lang/String;)V";
 
 pub const Error = error{ MainNotoFound, NoStorage, NoValue, NotEnoughArguments, TypeMismatch, ret, //TODO: this can never be an error, but zig wants it extra somehow
-MissingClass, Utf8Error, NullPointerException, IncompatibleClassChangeError, NoSuchMethod, ClassNotFound } || std.mem.Allocator.Error;
+MissingClass, Utf8Error, NullPointerException, IncompatibleClassChangeError, NoSuchMethod, ClassNotFound, InvalidConstantType, NoCurrentClass } || std.mem.Allocator.Error;
 
 pub const Vm = struct {
     storage: std.ArrayList(storage.Storage),

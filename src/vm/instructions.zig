@@ -29,7 +29,6 @@ pub fn execute(m: *vm.Vm, code: *bytecode.Buffer) Error!void {
 }
 
 pub fn execute_instruction(m: *vm.Vm, inst: bytecode.instructions.Instruction) ControlflowOrError!void {
-    std.debug.print("Executing instruction {}\n", .{@as(OpCode, inst)});
     switch (inst) {
         .nop => {},
         .bipush => |val| try i.bipush(m, val),
