@@ -5,8 +5,10 @@ const constant = @import("../../class_file/constant.zig");
 const variable = @import("../variable.zig");
 const utils = @import("../../utils.zig");
 
-pub fn getstatic(m: *vm.Vm, idx: u16) !void {
-    const class = m.current_class orelse return error.missing_class;
+const Error = vm.Error;
+
+pub fn getstatic(m: *vm.Vm, idx: u16) Error!void {
+    const class = m.current_class orelse return error.MissingClass;
 
     const items = &class.constant;
 
@@ -14,7 +16,7 @@ pub fn getstatic(m: *vm.Vm, idx: u16) !void {
 
     if (@as(constant.ConstantTag, item) != constant.ConstantTag.field_ref) {
         std.debug.print("Expected field_ref, got {} ({})\n", .{ @as(constant.ConstantTag, item), idx });
-        return error.invalid_type;
+        return error.TypeMismatch;
     }
 
     const field_ref = item.field_ref;

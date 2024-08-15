@@ -4,26 +4,31 @@ const vm = @import("vm.zig");
 const bytecode = @import("../bytecode/bytecode.zig");
 const OpCode = @import("../bytecode/opcodes.zig").OpCode;
 
+const Error = vm.Error;
+
 const i = @import("instructions/instruction_index.zig");
 
-pub const controlflow = error{
+pub const ControlFlow = error{
     ret,
 };
 
-pub fn execute(m: *vm.Vm, code: *bytecode.Buffer) !void {
+const ControlflowOrError = ControlFlow || Error;
+
+pub fn execute(m: *vm.Vm, code: *bytecode.Buffer) Error!void {
     while (try m.ip() < code.data.items.len) {
         const inst = code.data.items[try m.ip()];
 
         execute_instruction(m, inst) catch |err| {
-            if (err == controlflow.ret) {
+            if (err == ControlFlow.ret) {
                 return;
             }
+
             return err;
         };
     }
 }
 
-pub fn execute_instruction(m: *vm.Vm, inst: bytecode.instructions.Instruction) !void {
+pub fn execute_instruction(m: *vm.Vm, inst: bytecode.instructions.Instruction) ControlflowOrError!void {
     std.debug.print("Executing instruction {}\n", .{@as(OpCode, inst)});
     switch (inst) {
         .nop => {},
@@ -43,7 +48,7 @@ pub fn execute_instruction(m: *vm.Vm, inst: bytecode.instructions.Instruction) !
         .isub => try i.isub(m),
         .idiv => try i.idiv(m),
         .irem => try i.irem(m),
-        ._return => return controlflow.ret,
+        ._return => return ControlFlow.ret,
         .getstatic => |val| try i.getstatic(m, val),
         .invokevirtual => |val| try i.invokevirtual(m, val),
         .ldc => |val| try i.ldc(m, val),

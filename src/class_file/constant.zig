@@ -48,7 +48,7 @@ pub const Constants = struct {
         return str;
     }
 
-    pub fn get(self: *Constants, index: u16) !Constant {
+    pub fn get(self: *Constants, index: u16) Error!Constant {
         if (self.pool.items.len <= index - 1) {
             return Error.Utf8Error;
         }

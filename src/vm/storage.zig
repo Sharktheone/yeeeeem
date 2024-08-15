@@ -3,6 +3,10 @@ const stack = @import("stack.zig");
 const locals = @import("locals.zig");
 const variable = @import("variable.zig");
 
+const AllocError = std.mem.Allocator.Error;
+
+const Error = error{NotEnoughArguments};
+
 pub const Storage = struct {
     stack: stack.Stack,
     locals: locals.Locals,
@@ -16,11 +20,11 @@ pub const Storage = struct {
         };
     }
 
-    pub fn push(self: *Storage, value: variable.Variable) !void {
+    pub fn push(self: *Storage, value: variable.Variable) AllocError!void {
         try self.stack.push(value);
     }
 
-    pub fn pop(self: *Storage) !variable.Variable {
+    pub fn pop(self: *Storage) Error!variable.Variable {
         return self.stack.pop() orelse return error.NotEnoughArguments;
     }
 
@@ -44,7 +48,7 @@ pub const Storage = struct {
         return self.locals.three;
     }
 
-    pub fn local(self: *Storage, index: u32) !*variable.Variable {
+    pub fn local(self: *Storage, index: u32) Error!*variable.Variable {
         return self.locals.load(index) orelse return error.NotEnoughArguments;
     }
 

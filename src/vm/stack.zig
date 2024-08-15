@@ -3,22 +3,24 @@ const std = @import("std");
 const variable = @import("variable.zig");
 const ALLOC = @import("../alloc.zig").ALLOC;
 
+const AllocError = std.mem.Allocator.Error;
+
 pub const Stack = struct {
     frames: std.ArrayList(Frame),
 
-    pub fn init(capacity: usize) !Stack {
+    pub fn init(capacity: usize) AllocError!Stack {
         return Stack{
             .frames = try std.ArrayList(Frame).initCapacity(ALLOC, capacity),
         };
     }
 
-    pub fn add_frame(self: *Stack, name: ?utils.String) !void {
+    pub fn add_frame(self: *Stack, name: ?utils.String) AllocError!void {
         try self.frames.append(
             Frame{ .name = name, .variables = std.ArrayList(variable.Variable).init(ALLOC) },
         );
     }
 
-    pub fn push(self: *Stack, v: variable.Variable) !void {
+    pub fn push(self: *Stack, v: variable.Variable) AllocError!void {
         if (self.frames.items.len == 0) {
             try self.add_frame(null);
         }
@@ -82,7 +84,7 @@ pub const Frame = struct {
     name: ?utils.String,
     variables: std.ArrayList(variable.Variable),
 
-    pub fn push(self: *Frame, v: variable.Variable) !void {
+    pub fn push(self: *Frame, v: variable.Variable) AllocError!void {
         try self.variables.append(v);
     }
 

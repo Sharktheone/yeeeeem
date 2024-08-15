@@ -13,9 +13,8 @@ const ALLOC = @import("../alloc.zig").ALLOC;
 
 const MAIN: []const u8 = "main:([Ljava/lang/String;)V";
 
-const Error = error{
-    MainNotoFound,
-};
+pub const Error = error{ MainNotoFound, NoStorage, NoValue, NotEnoughArguments, TypeMismatch, ret, //TODO: this can never be an error, but zig wants it extra somehow
+MissingClass, Utf8Error, NullPointerException, IncompatibleClassChangeError, NoSuchMethod, ClassNotFound } || std.mem.Allocator.Error;
 
 pub const Vm = struct {
     storage: std.ArrayList(storage.Storage),
@@ -48,7 +47,7 @@ pub const Vm = struct {
         try self.invoke(m, &[0]variable.Variable{});
     }
 
-    pub fn invoke(self: *Vm, m: *Method, args: []variable.Variable) !void {
+    pub fn invoke(self: *Vm, m: *Method, args: []variable.Variable) Error!void {
         const bc = &m.bytecode;
         try self.new_storage(bc.max_stack, bc.max_locals);
 
@@ -58,14 +57,16 @@ pub const Vm = struct {
 
         try self.execute(bc);
 
-        const ret = self.get_storage().pop() orelse return error.NoValue;
+        var s = try self.get_storage();
+
+        const ret = try s.pop();
 
         self.pop_storage();
 
         try self.push(ret);
     }
 
-    pub fn execute(self: *Vm, c: *bytecode.Buffer) !void {
+    pub fn execute(self: *Vm, c: *bytecode.Buffer) Error!void {
         try instructions.execute(self, c);
     }
 
@@ -98,10 +99,10 @@ pub const Vm = struct {
             return;
         }
 
-        _ = vm.storage.items.pop();
+        _ = vm.storage.pop();
     }
 
-    pub fn push(vm: *Vm, v: variable.Variable) !void {
+    pub fn push(vm: *Vm, v: variable.Variable) Error!void {
         const s = vm.current_storage() orelse return error.NoStorage;
 
         try s.push(v);

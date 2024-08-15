@@ -7,7 +7,9 @@ const constant = @import("../../class_file/constant.zig");
 const methods = @import("../../class/method.zig");
 const utils = @import("../../utils.zig");
 
-pub fn invokevirtual(m: *vm.Vm, mref_idx: u16) !void {
+const Error = vm.Error;
+
+pub fn invokevirtual(m: *vm.Vm, mref_idx: u16) Error!void {
     var args = std.ArrayList(Variable).init(ALLOC);
     var objectref: variable.ObjectRef = undefined;
 
@@ -26,7 +28,7 @@ pub fn invokevirtual(m: *vm.Vm, mref_idx: u16) !void {
         try args.append(arg);
     }
 
-    var class = m.get_class(objectref.class.data.items) orelse return error.NullPointerException;
+    var class = m.get_class(objectref.class.data.items) orelse return error.ClassNotFound;
 
     if (m.current_class == null) {
         return error.NullPointerException;
@@ -68,9 +70,9 @@ pub fn invokevirtual(m: *vm.Vm, mref_idx: u16) !void {
 
         const field = f.value.class;
 
-        target = field.get_method(full_name) orelse return error.NoSuchMethodError;
+        target = field.get_method(full_name) orelse return error.NoSuchMethod;
     } else {
-        target = class.get_method(full_name) orelse return error.NoSuchMethodError;
+        target = class.get_method(full_name) orelse return error.NoSuchMethod;
     }
 
     try m.invoke(target, args.items);
