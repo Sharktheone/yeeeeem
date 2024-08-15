@@ -5,6 +5,7 @@ const variable = @import("../variable.zig");
 const ALLOC = @import("../../alloc.zig").ALLOC;
 const constant = @import("../../class_file/constant.zig");
 const methods = @import("../../class/method.zig");
+const utils = @import("../../utils.zig");
 
 pub fn invokevirtual(m: *vm.Vm, mref_idx: u16) !void {
     var args = std.ArrayList(Variable).init(ALLOC);
@@ -25,7 +26,7 @@ pub fn invokevirtual(m: *vm.Vm, mref_idx: u16) !void {
         try args.append(arg);
     }
 
-    var class = try m.get_class(objectref.class);
+    var class = m.get_class(objectref.class.data.items) orelse return error.NullPointerException;
 
     if (m.current_class == null) {
         return error.NullPointerException;
@@ -54,26 +55,23 @@ pub fn invokevirtual(m: *vm.Vm, mref_idx: u16) !void {
         return error.IncompatibleClassChangeError;
     }
 
-    const method_name_type = try const_items.get(method.name_and_type_index);
-
-    if (@as(constant.ConstantTag, method_name_type) != constant.ConstantTag.name_and_type) {
-        return error.IncompatibleClassChangeError;
-    }
-
-    const name = try m.current_class.?.constant.get_utf8(method_name_type.name_and_type.name_index);
-    const descriptor = try m.current_class.?.constant.get_utf8(method_name_type.name_and_type.descriptor_index);
-
-    const full_name = name ++ descriptor;
+    const full_name = try const_items.get_full_name(method.name_and_type_index);
 
     var target: *methods.Method = undefined;
 
     if (objectref.field != null) {
-        var field = try class.get_field(objectref.field.?);
+        const f = class.get_field(objectref.field.?.data.items) orelse return error.NullPointerException;
 
-        target = try field.get_method(full_name);
+        if (@as(variable.Type, f.value) != variable.Type.class) {
+            return error.IncompatibleClassChangeError;
+        }
+
+        const field = f.value.class;
+
+        target = field.get_method(full_name) orelse return error.NoSuchMethodError;
     } else {
-        target = try class.get_method(full_name);
+        target = class.get_method(full_name) orelse return error.NoSuchMethodError;
     }
 
-    m.invoke(target);
+    try m.invoke(target, args.items);
 }

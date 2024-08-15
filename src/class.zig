@@ -13,17 +13,22 @@ pub const Class = struct {
     minor_version: u16,
     major_version: u16,
     constant: constant.Constants,
-    fields: std.ArrayList(Field),
+    fields: std.StringHashMap(Field),
     methods: std.ArrayList(Method),
+    name: utils.String,
 
-    pub fn search_method(self: *Class, full_name: utils.String) ?Method {
-        for (self.methods.items) |m| {
+    pub fn get_method(self: *Class, full_name: utils.String) ?*Method {
+        for (self.methods.items) |*m| {
             if (m.full_name.is(&full_name)) {
                 return m;
             }
         }
 
         return null;
+    }
+
+    pub fn get_field(self: *Class, full_name: []const u8) ?Field {
+        return self.fields.get(full_name);
     }
 };
 
@@ -32,7 +37,8 @@ pub fn parse(data: []u8) !Class {
 
     var cf = try class_file.parse(&reader);
 
-    var fields = try std.ArrayList(Field).initCapacity(ALLOC, cf.fields.fields.items.len);
+    var fields = std.StringHashMap(Field).init(ALLOC);
+    try fields.ensureTotalCapacity(@intCast(cf.fields.fields.items.len));
 
     for (cf.fields.fields.items) |f| {
         const name = try cf.constant.get_utf8(f.name_index);
@@ -45,9 +51,7 @@ pub fn parse(data: []u8) !Class {
         try full_name.append(':');
         try full_name.appendSlice(descriptor);
 
-        try fields.append(Field{
-            .full_name = full_name,
-        });
+        _ = try fields.fetchPut(full_name.items, Field._void);
     }
 
     var methods = try std.ArrayList(Method).initCapacity(ALLOC, cf.methods.methods.items.len);
@@ -68,11 +72,16 @@ pub fn parse(data: []u8) !Class {
         } });
     }
 
+    const name_slice = try cf.constant.get_class(cf.this_class);
+
+    const name = try utils.String.from_slice(name_slice);
+
     return Class{
         .minor_version = cf.minor_version,
         .major_version = cf.major_version,
         .constant = cf.constant,
         .fields = fields,
         .methods = methods,
+        .name = name,
     };
 }

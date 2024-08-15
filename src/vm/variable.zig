@@ -1,4 +1,5 @@
 const utils = @import("../utils.zig");
+const class = @import("../class.zig");
 
 pub const Type = enum {
     void,
@@ -8,6 +9,7 @@ pub const Type = enum {
     double,
     string,
     objectref,
+    class,
 };
 
 pub const Variable = union(Type) {
@@ -18,6 +20,7 @@ pub const Variable = union(Type) {
     double: f64,
     string: utils.String,
     objectref: ObjectRef,
+    class: *class.Class,
 
     pub fn clone(self: *Variable) !Variable {
         return switch (self.*) {
@@ -28,6 +31,7 @@ pub const Variable = union(Type) {
             .double => |val| Variable{ .double = val },
             .string => |val| Variable{ .string = try val.clone() },
             .objectref => |val| Variable{ .objectref = val },
+            .class => |val| Variable{ .class = val },
         };
     }
 
@@ -48,6 +52,7 @@ pub const Variable = union(Type) {
                 }
                 std.debug.print("\n", .{});
             },
+            .class => std.debug.print("class: {}\n", .{self.class.name}),
         }
     }
 };

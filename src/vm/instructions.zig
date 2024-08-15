@@ -11,8 +11,6 @@ pub const controlflow = error{
 };
 
 pub fn execute(m: *vm.Vm, code: *bytecode.Buffer) !void {
-    try m.new_storage(code.max_stack, code.max_locals);
-
     while (try m.ip() < code.data.items.len) {
         const inst = code.data.items[try m.ip()];
 

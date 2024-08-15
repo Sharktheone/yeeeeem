@@ -7,6 +7,7 @@ const variable = @import("variable.zig");
 const locals = @import("locals.zig");
 const std = @import("std");
 const storage = @import("storage.zig");
+const Method = @import("../class/method.zig").Method;
 
 const ALLOC = @import("../alloc.zig").ALLOC;
 
@@ -36,15 +37,32 @@ pub const Vm = struct {
 
     pub fn entry(self: *Vm, c: *class.Class) !void {
         self.current_class = c;
-        const method = c.search_method(try utils.String.from_slice(MAIN));
+        const method = c.get_method(try utils.String.from_slice(MAIN));
 
         if (method == null) {
             return Error.MainNotoFound;
         }
 
-        var m = method.?;
+        const m = method.?;
 
-        try self.execute(&m.bytecode);
+        try self.invoke(m, &[0]variable.Variable{});
+    }
+
+    pub fn invoke(self: *Vm, m: *Method, args: []variable.Variable) !void {
+        const bc = &m.bytecode;
+        try self.new_storage(bc.max_stack, bc.max_locals);
+
+        for (args) |arg| {
+            try self.push(arg);
+        }
+
+        try self.execute(bc);
+
+        const ret = self.get_storage().pop() orelse return error.NoValue;
+
+        self.pop_storage();
+
+        try self.push(ret);
     }
 
     pub fn execute(self: *Vm, c: *bytecode.Buffer) !void {
@@ -96,5 +114,9 @@ pub const Vm = struct {
             s.dump();
             i += 1;
         }
+    }
+
+    pub fn get_class(self: *Vm, name: []const u8) ?*class.Class {
+        return self.classes.get(name);
     }
 };
