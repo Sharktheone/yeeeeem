@@ -27,7 +27,7 @@ pub fn parse(reader: *bytes.Reader) !instruction.Instruction {
         .athrow => instruction.Instruction.athrow,
         .baload => instruction.Instruction.baload,
         .bastore => instruction.Instruction.bastore,
-        .bipush => instruction.Instruction{ .bipush = try reader.read_u8() },
+        .bipush => instruction.Instruction{ .bipush = try reader.read_i8() },
         .breakpoint => instruction.Instruction.breakpoint,
         .caload => instruction.Instruction.caload,
         .castore => instruction.Instruction.castore,

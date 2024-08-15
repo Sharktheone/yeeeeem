@@ -20,7 +20,7 @@ pub const Instruction = union(opcodes.OpCode) {
     athrow,
     baload,
     bastore,
-    bipush: u8,
+    bipush: i8,
     breakpoint,
     caload,
     castore,

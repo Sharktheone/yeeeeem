@@ -60,6 +60,10 @@ pub const Vm = struct {
         return &self.storage.items[self.storage.items.len - 1];
     }
 
+    pub fn get_storage(self: *Vm) !*storage.Storage {
+        return self.current_storage() orelse return error.NoStorage;
+    }
+
     pub fn new_storage(vm: *Vm, s_cap: u32, l_cap: u32) !void {
         const s = try storage.Storage.init(s_cap, l_cap);
 
@@ -72,5 +76,11 @@ pub const Vm = struct {
         }
 
         _ = vm.storage.items.pop();
+    }
+
+    pub fn push(vm: *Vm, v: variable.Variable) !void {
+        const s = vm.current_storage() orelse return error.NoStorage;
+
+        try s.push(v);
     }
 };

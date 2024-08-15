@@ -27,7 +27,7 @@ pub const String = struct {
     }
 
     pub fn len(self: String) usize {
-        return self.data.len;
+        return self.data.items.len;
     }
 
     pub fn capacity(self: String) usize {
@@ -44,6 +44,16 @@ pub const String = struct {
 
     pub fn is(self: *const String, other: *const String) bool {
         return std.mem.eql(u8, self.data.allocatedSlice(), other.data.allocatedSlice());
+    }
+
+    pub fn clone(self: *const String) !String {
+        var buffer = try std.ArrayList(u8).initCapacity(ALLOC, self.len());
+
+        try buffer.appendSlice(self.data.allocatedSlice());
+
+        return String{
+            .data = buffer,
+        };
     }
 };
 

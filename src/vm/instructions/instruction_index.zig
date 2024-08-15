@@ -1,0 +1,17 @@
+pub const bipush = @import("bipush.zig").bipush;
+pub const istore_0 = @import("istore_0.zig").istore_0;
+pub const istore_1 = @import("istore_1.zig").istore_1;
+pub const istore_2 = @import("istore_2.zig").istore_2;
+pub const istore_3 = @import("istore_3.zig").istore_3;
+pub const istore = @import("istore.zig").istore;
+pub const iload_0 = @import("iload_0.zig").iload_0;
+pub const iload_1 = @import("iload_1.zig").iload_1;
+pub const iload_2 = @import("iload_2.zig").iload_2;
+pub const iload_3 = @import("iload_3.zig").iload_3;
+pub const iload = @import("iload.zig").iload;
+pub const iadd = @import("iadd.zig").iadd;
+pub const isub = @import("isub.zig").isub;
+pub const imul = @import("imul.zig").imul;
+pub const idiv = @import("idiv.zig").idiv;
+pub const irem = @import("irem.zig").irem;
+pub const ineg = @import("ineg.zig").ineg;

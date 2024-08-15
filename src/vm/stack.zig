@@ -14,30 +14,30 @@ pub const Stack = struct {
 
     pub fn add_frame(self: *Stack, name: ?utils.String) !void {
         try self.frames.append(
-            Frame{ .name = name, .variables = std.ArrayList.init(ALLOC) },
+            Frame{ .name = name, .variables = std.ArrayList(variable.Variable).init(ALLOC) },
         );
     }
 
     pub fn push(self: *Stack, v: variable.Variable) !void {
-        if (self.frames.len == 0) {
-            self.add_frame(null);
+        if (self.frames.items.len == 0) {
+            try self.add_frame(null);
         }
 
-        const frame = self.frames.items[self.frames.len - 1];
+        var frame = self.frames.items[self.frames.items.len - 1];
         try frame.variables.append(v);
     }
 
     pub fn pop(self: *Stack) ?variable.Variable {
-        if (self.frames.len == 0) {
+        if (self.frames.items.len == 0) {
             return null;
         }
 
-        const frame = self.frames.items[self.frames.len - 1];
+        var frame = self.frames.items[self.frames.items.len - 1];
         return frame.pop();
     }
 
     pub fn pop_frame(self: *Stack) ?Frame {
-        if (self.frames.len == 0) {
+        if (self.frames.items.len == 0) {
             return null;
         }
 
@@ -45,7 +45,7 @@ pub const Stack = struct {
     }
 
     pub fn get_frame(self: *Stack, index: usize) ?*Frame {
-        if (index >= self.frames.len) {
+        if (index >= self.frames.items.len) {
             return null;
         }
 
@@ -53,11 +53,11 @@ pub const Stack = struct {
     }
 
     pub fn load(self: *Stack, idx: usize) ?*variable.Variable {
-        if (self.frames.len == 0) {
+        if (self.frames.items.len == 0) {
             return null;
         }
 
-        const frame = self.frames.items[self.frames.len - 1];
+        var frame = self.frames.items[self.frames.items.len - 1];
 
         return frame.load(idx);
     }
@@ -72,7 +72,7 @@ pub const Frame = struct {
     }
 
     pub fn pop(self: *Frame) ?variable.Variable {
-        if (self.variables.len == 0) {
+        if (self.variables.items.len == 0) {
             return null;
         }
 

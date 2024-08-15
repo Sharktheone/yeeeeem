@@ -36,7 +36,7 @@ pub const Locals = struct {
         const real_idx = idx - 4;
 
         if (real_idx >= self.rest.items.len) {
-            try self.rest.items.append(value);
+            try self.rest.append(value);
         } else {
             self.rest.items[real_idx] = value;
         }

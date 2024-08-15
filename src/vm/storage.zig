@@ -15,12 +15,12 @@ pub const Storage = struct {
         };
     }
 
-    pub fn push(self: *Storage, value: variable.Variable) void {
-        self.stack.push(value);
+    pub fn push(self: *Storage, value: variable.Variable) !void {
+        try self.stack.push(value);
     }
 
-    pub fn pop(self: *Storage) ?variable.Variable {
-        return self.stack.pop();
+    pub fn pop(self: *Storage) !variable.Variable {
+        return self.stack.pop() orelse return error.NotEnoughArguments;
     }
 
     pub fn load(self: *Storage, index: u32) ?*variable.Variable {
@@ -43,8 +43,8 @@ pub const Storage = struct {
         return self.locals.three;
     }
 
-    pub fn local(self: *Storage, index: u32) variable.Variable {
-        return self.locals.load(index);
+    pub fn local(self: *Storage, index: u32) !*variable.Variable {
+        return self.locals.load(index) orelse return error.NotEnoughArguments;
     }
 
     pub fn store(self: *Storage, index: u32, value: variable.Variable) !void {
